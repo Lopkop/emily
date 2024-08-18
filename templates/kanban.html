@@ -1,0 +1,130 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Kanban for Radik and Robert</title>
+
+        <link rel="stylesheet" href="{% static 'kanban.css'%}" />
+        <script src="{% static 'drag.js' %}" defer></script>
+        <script src="{% static 'todo.js' %}" defer></script>
+    </head>
+    <body>
+        <div class="board">
+            <form method="post">
+                {% csrf_token %} {{form.asd_p}}
+                <!-- <input type="text" placeholder="New TODO..." /> -->
+                <button type="submit">Add +</button>
+            </form>
+
+            <div class="lanes">
+                {% for todo in todos %} {% if todo.todo_type == "todo" %}
+                <div class="swim-lane" id="todo-lane">
+                    <h3 class="heading">TODO</h3>
+
+                    <textarea class="task" draggable="true">
+{{ todo.text }}</textarea
+                    >
+                </div>
+
+                {% elif todo.todo_type == "doing" %}
+                <div class="swim-lane">
+                    <h3 class="heading">Doing</h3>
+
+                    <textarea class="task" draggable="true">
+{{ todo.text }}</textarea
+                    >
+                </div>
+
+                {% elif todo.todo_type == "done" %}
+                <div class="swim-lane">
+                    <h3 class="heading">Done</h3>
+
+                    <textarea class="task" draggable="true">
+{{ todo.text }}</textarea
+                    >
+                </div>
+                {% endif %} {% endfor %}
+            </div>
+        </div>
+    </body>
+</html>
+
+<!-- <!doctype html>
+{% load static %}
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Kanban for Radik and Robert</title>
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="{% static 'kanban.css' %}"
+        />
+    </head>
+
+    <body>
+        <div id="container">
+            {% if todos %}
+            <ul>
+                {% for todo in todos %} {% if todo.todo_type == "todo" %}
+                <div id="card" class="todo">
+                    <a>{{ todo.text }}</a>
+                </div>
+
+                {% elif todo.todo_type == "in process" %}
+                <div id="card" class="in_process">
+                    <a>{{ todo.text }}</a>
+                </div>
+
+                {% elif todo.todo_type == "finished" %}
+                <div id="card" class="finished">
+                    <a>{{ todo.text }}</a>
+                </div>
+
+                {% endif %} {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </body>
+
+    <script>
+        let newX = 0,
+            newY = 0,
+            startX = 0,
+            startY = 0;
+
+        const card = document.getElementById("card");
+
+        card.addEventListener("mousedown", mouseDown);
+
+        function mouseDown(e) {
+            startX = e.clientX;
+            startY = e.clientY;
+
+            document.addEventListener("mousemove", mouseMove);
+            document.addEventListener("mouseup", mouseUp);
+        }
+
+        function mouseMove(e) {
+            newX = startX - e.clientX;
+            newY = startY - e.clientY;
+
+            startX = e.clientX;
+            startY = e.clientY;
+
+            card.style.top = card.offsetTop - newY + "px";
+            card.style.left = card.offsetLeft - newX + "px";
+        }
+
+        function mouseUp(e) {
+            document.removeEventListener("mousemove", mouseMove);
+        }
+    </script>
+</html> -->
