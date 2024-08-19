@@ -1,9 +1,8 @@
-const form = document.getElementById("todo-form");
-const input = document.getElementById("todo-input");
+const form = document.getElementById("todo-id");
+const input = document.getElementById("d");
 const todoLane = document.getElementById("todo-lane");
 
 form.addEventListener("submit", (e) => {
-  e.preventDefault();
   const value = input.value;
 
   if (!value) return;

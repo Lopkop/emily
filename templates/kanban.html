@@ -13,44 +13,45 @@
     </head>
     <body>
         <div class="board">
-            <form method="post">
-                {% csrf_token %} {{form.asd_p}}
-                <!-- <input type="text" placeholder="New TODO..." /> -->
+            <form method="post" id="todo-id">
+                {% csrf_token %} {{ form.as_table }}
                 <button type="submit">Add +</button>
             </form>
 
             <div class="lanes">
-                {% for todo in todos %} {% if todo.todo_type == "todo" %}
-                <div class="swim-lane" id="todo-lane">
+                <div name="todo" class="swim-lane" id="todo-lane">
                     <h3 class="heading">TODO</h3>
-
-                    <textarea class="task" draggable="true">
-{{ todo.text }}</textarea
-                    >
                 </div>
 
-                {% elif todo.todo_type == "doing" %}
-                <div class="swim-lane">
+                <div name="doing" class="swim-lane">
                     <h3 class="heading">Doing</h3>
-
-                    <textarea class="task" draggable="true">
-{{ todo.text }}</textarea
-                    >
                 </div>
 
-                {% elif todo.todo_type == "done" %}
-                <div class="swim-lane">
+                <div name="done" class="swim-lane">
                     <h3 class="heading">Done</h3>
-
-                    <textarea class="task" draggable="true">
-{{ todo.text }}</textarea
-                    >
                 </div>
-                {% endif %} {% endfor %}
             </div>
         </div>
     </body>
 </html>
+
+{{ todos|json_script:"follower"}}
+<script>
+    const data = JSON.parse(
+        JSON.parse(document.getElementById("follower").textContent),
+    );
+
+    for (let i = 0; i < data.length; i++) {
+        let fields = data[i]["fields"];
+        let todo_type = fields["todo_type"];
+        let new_todo = document.createElement("textarea");
+        new_todo.value = fields["text"];
+        new_todo.classList.add("task");
+        new_todo.draggable = "true";
+        let div = document.getElementsByName(todo_type)[0];
+        div.appendChild(new_todo);
+    }
+</script>
 
 <!-- <!doctype html>
 {% load static %}

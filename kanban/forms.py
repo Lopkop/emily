@@ -2,7 +2,7 @@ from django import forms
 
 class TodoForm(forms.Form):
 
-    text = forms.TextInput()
+    text = forms.CharField()
 
     class meta:
         fields = ("text",)
