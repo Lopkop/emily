@@ -13,7 +13,7 @@
     </head>
     <body>
         <div class="board">
-            <form method="post" id="todo-id">
+            <form method="post" id="todo-id" class="todo-id">
                 {% csrf_token %} {{ form.as_table }}
                 <button type="submit">Add +</button>
             </form>
@@ -48,84 +48,82 @@
         new_todo.value = fields["text"];
         new_todo.classList.add("task");
         new_todo.draggable = "true";
+        new_todo.id = data[i]["pk"]; // Assign the id from the Todo object
+
+        let deleteButton = document.createElement("button");
+        deleteButton.innerHTML = "Delete";
+        deleteButton.classList.add("delete-btn");
+        deleteButton.id = new_todo.id;
+        deleteButton.hidden = true;
+        deleteButton.onclick = function () {
+            deleteTodoTask(new_todo, deleteButton);
+        };
+
+        deleteButton.addEventListener("mousedown", function (event) {
+            event.preventDefault(); // Prevent the textarea from losing focus
+        });
+
+        new_todo.addEventListener("input", function () {
+            updateTodoText(new_todo.id, new_todo.value);
+        });
+
+        new_todo.addEventListener("focus", function () {
+            deleteButton.hidden = false;
+        });
+
+        new_todo.addEventListener("blur", function () {
+            deleteButton.hidden = true;
+        });
+
         let div = document.getElementsByName(todo_type)[0];
         div.appendChild(new_todo);
+        div.appendChild(deleteButton);
+    }
+
+    function updateTodoText(todoId, newText) {
+        fetch("/update_todo_text/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": document.querySelector(
+                    "[name=csrfmiddlewaretoken]",
+                ).value,
+            },
+            body: `id=${todoId}&text=${encodeURIComponent(newText)}`,
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.status !== "success") {
+                    console.error("Failed to update todo text");
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
+
+    function deleteTodoTask(todo, button) {
+        fetch("/delete_todo_task/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": document.querySelector(
+                    "[name=csrfmiddlewaretoken]",
+                ).value,
+            },
+            body: `id=${todo.id}`,
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.status === "success") {
+                    todo.remove(); // Remove the task from the DOM
+                    button.remove();
+                } else {
+                    console.error("Failed to delete todo task");
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     }
 </script>
-
-<!-- <!doctype html>
-{% load static %}
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Kanban for Radik and Robert</title>
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, shrink-to-fit=no"
-        />
-        <link
-            rel="stylesheet"
-            type="text/css"
-            href="{% static 'kanban.css' %}"
-        />
-    </head>
-
-    <body>
-        <div id="container">
-            {% if todos %}
-            <ul>
-                {% for todo in todos %} {% if todo.todo_type == "todo" %}
-                <div id="card" class="todo">
-                    <a>{{ todo.text }}</a>
-                </div>
-
-                {% elif todo.todo_type == "in process" %}
-                <div id="card" class="in_process">
-                    <a>{{ todo.text }}</a>
-                </div>
-
-                {% elif todo.todo_type == "finished" %}
-                <div id="card" class="finished">
-                    <a>{{ todo.text }}</a>
-                </div>
-
-                {% endif %} {% endfor %}
-            </ul>
-            {% endif %}
-        </div>
-    </body>
-
-    <script>
-        let newX = 0,
-            newY = 0,
-            startX = 0,
-            startY = 0;
-
-        const card = document.getElementById("card");
-
-        card.addEventListener("mousedown", mouseDown);
-
-        function mouseDown(e) {
-            startX = e.clientX;
-            startY = e.clientY;
-
-            document.addEventListener("mousemove", mouseMove);
-            document.addEventListener("mouseup", mouseUp);
-        }
-
-        function mouseMove(e) {
-            newX = startX - e.clientX;
-            newY = startY - e.clientY;
-
-            startX = e.clientX;
-            startY = e.clientY;
-
-            card.style.top = card.offsetTop - newY + "px";
-            card.style.left = card.offsetLeft - newX + "px";
-        }
-
-        function mouseUp(e) {
-            document.removeEventListener("mousemove", mouseMove);
-        }
-    </script>
-</html> -->

@@ -7,6 +7,8 @@ draggables.forEach((task) => {
   });
   task.addEventListener("dragend", () => {
     task.classList.remove("is-dragging");
+    const newLane = task.parentElement.getAttribute("name");
+    updateTodoType(task.id, newLane);
   });
 });
 
@@ -44,3 +46,23 @@ const insertAboveTask = (zone, mouseY) => {
 
   return closestTask;
 };
+
+function updateTodoType(todoId, newTodoType) {
+  fetch("/update_todo_type/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+    },
+    body: `id=${todoId}&todo_type=${newTodoType}`,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status !== "success") {
+        console.error("Failed to update todo type");
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
